@@ -1,7 +1,9 @@
 package org.insa.graphs.model;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -56,6 +58,8 @@ public class Path {
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
+        // Pour chaque node, on parcourt tous ses successeurs
+        // si valid + plus petite taille
         // TODO:
         return new Path(graph, arcs);
     }
@@ -202,7 +206,19 @@ public class Path {
      */
     public boolean isValid() {
         // TODO:
-        return false;
+    	boolean valid = false;
+    	if (this.isEmpty() || (this.size()==1)){
+    		valid= true;}
+    	else if (this.arcs.get(1).getOrigin()==this.getOrigin()) {
+    		for (Iterator<Arc> it=this.arcs.iterator(); it.hasNext();) {
+        		Arc arc= it.next();
+        		if (arc.getDestination()==it.next().getOrigin()) {
+        			valid=true;
+        		}
+        		else valid=false;
+        	}
+    	}
+        return valid;
     }
 
     /**
@@ -213,8 +229,12 @@ public class Path {
      * @deprecated Need to be implemented.
      */
     public float getLength() {
-        // TODO:
-        return 0;
+        //TODO:
+    	int length=0;
+    	for (Iterator<Arc> it=this.arcs.iterator(); it.hasNext();) {
+    		Arc arc= it.next();
+    		length+= arc.getLength(); }
+        return length;
     }
 
     /**
@@ -229,7 +249,7 @@ public class Path {
      */
     public double getTravelTime(double speed) {
         // TODO:
-        return 0;
+        return speed*this.getLength();
     }
 
     /**
@@ -242,7 +262,11 @@ public class Path {
      */
     public double getMinimumTravelTime() {
         // TODO:
-        return 0;
+    	int min=0;
+    	for (Iterator<Arc> it=this.arcs.iterator(); it.hasNext();) {
+    		Arc arc= it.next();
+    		min+= arc.getMinimumTravelTime(); }
+        return min;
     }
 
 }
