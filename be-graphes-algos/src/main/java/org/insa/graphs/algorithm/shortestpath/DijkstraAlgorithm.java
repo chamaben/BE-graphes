@@ -37,16 +37,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    	heap.remove(x);
 	    	x.setMark(true);
 	    	notifyNodeMarked(x.getSommet());
-	    	System.out.println("Nombre de successeurs : "+ x.getSommet().getNumberOfSuccessors());
-	    	int n=0;
+	    	if(x.getSommet() == data.getDestination()) break;
 	    	for (Arc succ: x.getSommet().getSuccessors()) {
-	    		n++;
-	    		System.out.println("itération : "+ n);
 	    		Label y=labels.get(succ.getDestination().getId());
 	    		if (y.getMark()==false) {
 	    			if (y.getCost()>x.getCost()+succ.getLength()) {
 	    				 if(y.getPere()!=null) heap.remove(y);
-	    				 System.out.println("remove effecuté");
 	    				y.setCost(x.getCost()+succ.getLength());
 	    				heap.insert(y);
 	    				y.setPere(succ);
