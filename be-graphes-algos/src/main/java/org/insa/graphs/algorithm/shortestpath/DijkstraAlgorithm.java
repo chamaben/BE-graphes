@@ -32,29 +32,34 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         //itérations
         Label x;
+        float cout= 0;
         while (!heap.isEmpty()) {
 	    	x=heap.findMin();
 	    	heap.remove(x);
 	    	x.setMark(true);
 	    	notifyNodeMarked(x.getSommet());
+	    	System.out.println("Nombre de successeurs de x: "+ x.getSommet().getNumberOfSuccessors());
 	    	if(x.getSommet() == data.getDestination()) break;
 	    	for (Arc succ: x.getSommet().getSuccessors()) {
+	    		if(!data.isAllowed(succ)) break;
 	    		Label y=labels.get(succ.getDestination().getId());
 	    		if (y.getMark()==false) {
 	    			if (y.getCost()>x.getCost()+succ.getLength()) {
-	    				 if(y.getPere()!=null) heap.remove(y);
+	    				if(y.getPere()!=null) heap.remove(y);
 	    				y.setCost(x.getCost()+succ.getLength());
 	    				heap.insert(y);
 	    				y.setPere(succ);
+	    				cout= cout + y.getCost();
+	    				System.out.println(cout);
 	    			}
 	    		}
 	    	}
         }
-        if (labels.get(data.getDestination().getId()) == null) {
+        if (labels.get(data.getDestination().getId()).getPere() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {
-        	notifyDestinationReached(data.getDestination());
+        	
         	ArrayList<Arc> arcs = new ArrayList<>();
             Arc arc = labels.get(data.getDestination().getId()).getPere();
             while (arc != null) {
@@ -62,7 +67,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 arc = labels.get(arc.getOrigin().getId()).getPere();
             }
             Collections.reverse(arcs);
-            solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+            /*if (arcs.get((int)(arc.getLength()-1)).getDestination()!=data.getDestination()) {
+            	solution = new ShortestPathSolution(data, Status.INFEASIBLE);
+            }
+            else {*/
+        	notifyDestinationReached(data.getDestination());
+        	solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+            //}
         }
     
         return solution;
