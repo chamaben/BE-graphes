@@ -23,34 +23,31 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ShortestPathSolution solution = null;
         // TODO:
         //initialisation 
-        for (Node node: graph.getNodes()) {
-        	labels.add(new Label(node));
-        }
-        Label labelOrigin = labels.get(data.getOrigin().getId()); // origine de l'arc
-        labelOrigin.setCost(0);
-        heap.insert(labelOrigin);
+        
+        Initialisation(graph, labels, heap, data);
         
         //itérations
         Label x;
-        float cout= 0;
+        double cout= 0;
         while (!heap.isEmpty()) {
 	    	x=heap.findMin();
 	    	heap.remove(x);
 	    	x.setMark(true);
 	    	notifyNodeMarked(x.getSommet());
-	    	System.out.println("Nombre de successeurs de x: "+ x.getSommet().getNumberOfSuccessors());
+	    	//System.out.println("Nombre de successeurs de x: "+ x.getSommet().getNumberOfSuccessors());
 	    	if(x.getSommet() == data.getDestination()) break;
 	    	for (Arc succ: x.getSommet().getSuccessors()) {
 	    		if(!data.isAllowed(succ)) break;
 	    		Label y=labels.get(succ.getDestination().getId());
 	    		if (y.getMark()==false) {
-	    			if (y.getCost()>x.getCost()+succ.getLength()) {
+	    			//System.out.println(x.getTotCost()+succ.getLength());
+	    			if (y.getTotCost()>x.getTotCost()+succ.getLength()) {
+	    				//System.out.println("a");
 	    				if(y.getPere()!=null) heap.remove(y);
-	    				y.setCost(x.getCost()+succ.getLength());
+	    				y.setTotCost(x.getTotCost()+succ.getLength());
 	    				heap.insert(y);
 	    				y.setPere(succ);
-	    				cout= cout + y.getCost();
-	    				System.out.println(cout);
+	    				cout= cout + y.getTotCost();
 	    			}
 	    		}
 	    	}
@@ -67,16 +64,21 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 arc = labels.get(arc.getOrigin().getId()).getPere();
             }
             Collections.reverse(arcs);
-            /*if (arcs.get((int)(arc.getLength()-1)).getDestination()!=data.getDestination()) {
-            	solution = new ShortestPathSolution(data, Status.INFEASIBLE);
-            }
-            else {*/
         	notifyDestinationReached(data.getDestination());
         	solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
             //}
         }
     
         return solution;
+    }
+    
+    public void Initialisation(Graph graph, ArrayList<Label> labels, BinaryHeap<Label> heap, ShortestPathData data){
+    	for (Node node: graph.getNodes()) {
+        	labels.add(new Label(node));
+        }
+        Label labelOrigin = labels.get(data.getOrigin().getId()); // origine de l'arc
+        labelOrigin.setCost(0);
+        heap.insert(labelOrigin);
     }
 
 }
