@@ -13,26 +13,24 @@ public class LabelStar extends Label{
 		
 	}
 	
-	public double getCout_Estime() {
-		return this.cout_estime;
-	}
-	
-	public void setCout_Estime(double cout_estime) {
-		this.cout_estime= cout_estime;
-	}
-		
-	final public double getTotCost() {
-		this.cout_total=this.getCout_Estime()+this.getCost();
+	public double GetHeuristicCost() {
+		this.cout_total=this.getCost()+this.cout_estime;
+		//System.out.println(" cout " + this.getCost() + " cout estime " + this.GetCoutEstime());
 		return this.cout_total;
 	}
 	
+	public void setCout_Estime(double cout) {
+		this.cout_estime=cout;
+	}
+	
 	@Override
-	final public int compareTo(Label other) {
-		int valeur;
-		if (this.getTotCost()<((LabelStar)other).getTotCost()) valeur=-1;
-		else if (this.getTotCost()>((LabelStar)other).getTotCost()) valeur=1;
-		else valeur=0;
-		return valeur;
+	public int compareTo(Label other) {
+		// TODO Auto-generated  method stub
+	       int valeur;
+	       if (this.GetHeuristicCost()<((LabelStar) other).GetHeuristicCost()) valeur=-1;
+	       else if (this.GetHeuristicCost()>((LabelStar) other).GetHeuristicCost()) valeur=1;
+	       else valeur=0;
+	       return valeur;
 	}
 	
 

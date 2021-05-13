@@ -48,9 +48,9 @@ public class Label implements Comparable<Label>{
 	
 	public Label(Node init_sommet) {
 		this.sommet_courant= init_sommet;
-		marque=false;
-		cout=Float.POSITIVE_INFINITY;
-		pere=null;
+		this.marque=false;
+		this.cout=Float.POSITIVE_INFINITY;
+		this.pere=null;
 	}
 
 	@Override

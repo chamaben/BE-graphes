@@ -16,7 +16,6 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
     	for (Node node: graph.getNodes()) {
     		LabelStar a=new LabelStar(node);
     		a.setCout_Estime(a.getSommet().getPoint().distanceTo(data.getDestination().getPoint()));
-    		System.out.println("Id du label " + a.getSommet().getId());
         	labels.add(a);
         }
     	
