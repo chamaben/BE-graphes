@@ -2,8 +2,6 @@ package org.insa.graphs.algorithm.utils;
 
 import java.util.ArrayList;
 
-import org.insa.graphs.model.Arc;
-import org.insa.graphs.model.Node;
 
 /**
  * Implements a binary heap containing elements of type E.
