@@ -34,18 +34,23 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    	heap.remove(x);
 	    	x.setMark(true);
 	    	notifyNodeMarked(x.getSommet());
-	    	//System.out.println("Nombre de successeurs de x: "+ x.getSommet().getNumberOfSuccessors());
+	    	System.out.println("Nombre de successeurs de x: "+ x.getSommet().getNumberOfSuccessors());
 	    	if(x.getSommet() == data.getDestination()) break;
 	    	for (Arc succ: x.getSommet().getSuccessors()) {
 	    		if(!data.isAllowed(succ)) break;
 	    		Label y=labels.get(succ.getDestination().getId());
 	    		if (y.getMark()==false) {
-	    			//System.out.println(x.getTotCost()+data.getCost(succ));
+	    			System.out.println(x.getTotCost()+data.getCost(succ));
 	    			if (y.getTotCost()>x.getTotCost()+data.getCost(succ)) {
-	    				//System.out.println("a");
 	    				if(y.getPere()!=null) heap.remove(y);
 	    				y.setTotCost(x.getTotCost()+data.getCost(succ));
 	    				heap.insert(y);
+	    				// test validité du tas
+	    				if(heap.isValid()) {
+	    		        	System.out.println("Le tas est valide.");
+	    		        } else {
+	    		        	System.out.println("Le tas est invalide.");
+	    		        }
 	    				y.setPere(succ);
 	    				cout= cout + y.getTotCost();
 	    			}
@@ -68,7 +73,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
             //}
         }
-    
+        // test solution valide
+        if(solution.getPath().isValid()) {
+        	System.out.println("La solution est valide.");
+        } else {
+        	System.out.println("La solution est invalide.");
+        }
+        // affichage solution correcte
+        System.out.println("Longueur du chemin trouvé " + solution.getPath().getLength());
+        
         return solution;
     }
     
