@@ -40,11 +40,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    		if(!data.isAllowed(succ)) break;
 	    		Label y=labels.get(succ.getDestination().getId());
 	    		if (y.getMark()==false) {
-	    			//System.out.println(x.getTotCost()+succ.getLength());
-	    			if (y.getTotCost()>x.getTotCost()+succ.getLength()) {
+	    			//System.out.println(x.getTotCost()+data.getCost(succ));
+	    			if (y.getTotCost()>x.getTotCost()+data.getCost(succ)) {
 	    				//System.out.println("a");
 	    				if(y.getPere()!=null) heap.remove(y);
-	    				y.setTotCost(x.getTotCost()+succ.getLength());
+	    				y.setTotCost(x.getTotCost()+data.getCost(succ));
 	    				heap.insert(y);
 	    				y.setPere(succ);
 	    				cout= cout + y.getTotCost();
