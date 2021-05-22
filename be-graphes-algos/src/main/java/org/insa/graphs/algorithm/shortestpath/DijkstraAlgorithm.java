@@ -71,16 +71,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             Collections.reverse(arcs);
         	notifyDestinationReached(data.getDestination());
         	solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
-            //}
+            
+            // test solution valide
+            if(solution.getPath().isValid()) {
+            	System.out.println("La solution est valide.");
+            } else {
+            	System.out.println("La solution est invalide.");
+            }
+            // affichage solution correcte
+            System.out.println("Longueur du chemin trouvé " + solution.getPath().getLength());
         }
-        // test solution valide
-        if(solution.getPath().isValid()) {
-        	System.out.println("La solution est valide.");
-        } else {
-        	System.out.println("La solution est invalide.");
-        }
-        // affichage solution correcte
-        System.out.println("Longueur du chemin trouvé " + solution.getPath().getLength());
+
         
         return solution;
     }
