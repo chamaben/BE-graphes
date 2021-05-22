@@ -1,10 +1,10 @@
 package org.insa.graphs.algorithm.shortestpath;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
+import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.model.*;
 import org.insa.graphs.model.RoadInformation.RoadType;
-
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -17,6 +17,9 @@ public class DijkstraTest{
 	// Small graph use for tests
     private static Graph graph;
     
+    // graph statistics
+    private static GraphStatistics graphstatistics;
+    
     // list of Points
     private static Point[] points; 
 
@@ -28,20 +31,26 @@ public class DijkstraTest{
     private static Arc a2b, a2c, a2e, b2c, c2d_1, c2d_2, c2d_3, c2a, d2a, d2e, e2d, f2g, e2h, e2i, e2j;
     
     // data examples
-    private static ShortestPathData data1d, data1t, data2d, data2t, data3d, data3t;
+    protected static ShortestPathData data1d, data1t, data2d, data2t, data3d, data3t;
     
     // Bellman Ford
-    private static BellmanFordAlgorithm bellman1d, bellman1t, bellman2d, bellman2t, bellman3d, bellman3t;
+    @SuppressWarnings("unused")
+	private static BellmanFordAlgorithm bellman1d, bellman1t, bellman2d, bellman2t, bellman3d, bellman3t;
     
     //Dijkstra
-    private static DijkstraAlgorithm dijkstra1d, dijkstra2d, dijkstra3d, dijkstra1t, dijkstra2t, dijkstra3t;
+    @SuppressWarnings("unused")
+	protected static DijkstraAlgorithm cas1d, cas2d, cas3d, cas1t, cas2t, cas3t;
     
     //A*
-    private static AStarAlgorithm astar1d, astar2d, astar3d, astar1t, astar2t, astar3t;
+    @SuppressWarnings("unused")
+	private static AStarAlgorithm astar1d, astar2d, astar3d, astar1t, astar2t, astar3t;
+    
 
 
     @BeforeClass
     public static void initAll() throws IOException {
+    	
+    	//Graph reader = new BinaryGraphReader(new DataInputStream(new BufferedInputStream(new FileInputStream(" ")))).read();
 
         // 10 and 20 meters per seconds
         RoadInformation speed10 = new RoadInformation(RoadType.MOTORWAY, null, true, 36, ""),
@@ -84,8 +93,11 @@ public class DijkstraTest{
         e2i = Node.linkNodes(nodes[4], nodes[9], 45, speed20, null);
         e2j = Node.linkNodes(nodes[4], nodes[10], 10, speed30, null);
         
+        //add graph statistic
+        graphstatistics= new GraphStatistics(null, 0, 0, 40, 0);
+        
         //add graph
-        graph = new Graph("ID", "", Arrays.asList(nodes), null);
+        graph = new Graph("ID", "", Arrays.asList(nodes), graphstatistics);
         
         // add data
         data1d= new ShortestPathData(graph, nodes[0], nodes[0], ArcInspectorFactory.getAllFilters().get(0));
@@ -102,67 +114,58 @@ public class DijkstraTest{
         bellman2t = new BellmanFordAlgorithm(data2t);
         bellman3d = new BellmanFordAlgorithm(data3d);
         bellman3t = new BellmanFordAlgorithm(data3t);
-        dijkstra1d = new DijkstraAlgorithm(data1d);
-        dijkstra1t = new DijkstraAlgorithm(data1t);
-        dijkstra2d = new DijkstraAlgorithm(data2d);
-        dijkstra2t = new DijkstraAlgorithm(data2t);
-        dijkstra3d = new DijkstraAlgorithm(data3d);
-        dijkstra3t = new DijkstraAlgorithm(data3t);
-        astar1d = new AStarAlgorithm(data1d);
-        astar1t = new AStarAlgorithm(data1t);
-        astar2d = new AStarAlgorithm(data2d);
-        astar2t = new AStarAlgorithm(data2t);
-        astar2d = new AStarAlgorithm(data2d);
-        astar2t = new AStarAlgorithm(data2t);
+        
+        executeAlgo();
         
     }
     
+    public static void executeAlgo() {
+    	cas1d = new DijkstraAlgorithm(data1d);
+        cas1t = new DijkstraAlgorithm(data1t);
+        cas2d = new DijkstraAlgorithm(data2d);
+        cas2t = new DijkstraAlgorithm(data2t);
+        cas3d = new DijkstraAlgorithm(data3d);
+        cas3t = new DijkstraAlgorithm(data3t);
+    }
+    
+
+    
     @Test
-    public void testIsValidDijskstra() {
+    public void testIsValid() {  //teste si les solutions sont valides
     	//distance
-    	assertTrue(dijkstra1d.doRun().getPath().isValid()); //origine=destination
-    	assertTrue(dijkstra2d.doRun().getPath().isValid()); //solution possible
-    	assertTrue(dijkstra3d.doRun().getPath().isValid()); //graphe non connexe
+    	assertTrue(cas2d.doRun().getPath().isValid()); //solution possible
     	//temps
-    	assertTrue(dijkstra1t.doRun().getPath().isValid()); //origine=destination
-    	assertTrue(dijkstra2t.doRun().getPath().isValid()); //solution possible
-    	assertTrue(dijkstra3t.doRun().getPath().isValid()); //graphe non connexe
+    	assertTrue(cas2t.doRun().getPath().isValid()); //solution possible
     }
     
     @Test
-    public void testIsValidAstar() {
-    	//distance
-    	assertTrue(astar1d.doRun().getPath().isValid());
-    	assertTrue(astar2d.doRun().getPath().isValid());
-    	assertTrue(astar3d.doRun().getPath().isValid());
-    	//temps
-    	assertTrue(astar1t.doRun().getPath().isValid());
-    	assertTrue(astar2t.doRun().getPath().isValid());
-    	assertTrue(astar3t.doRun().getPath().isValid());
+    public void TestInfeasable1() {
+    	assertEquals(Status.INFEASIBLE, cas1d.doRun().getStatus());
+    	assertNull(cas1d.doRun().getPath());
+    	assertEquals(Status.INFEASIBLE, cas1t.doRun().getStatus());
+    	assertNull(cas1t.doRun().getPath());
+    	
     }
     
     @Test
-    public void testDijkstra() {
+    public void TestInfeasable2() {
+    	assertEquals(Status.INFEASIBLE, cas3d.doRun().getStatus());
+    	assertNull(cas3d.doRun().getPath());
+    	assertEquals(Status.INFEASIBLE, cas3t.doRun().getStatus());
+    	assertNull(cas3t.doRun().getPath());
+    	
+    }
+    
+
+	@Test
+    public void testBellman() {
     	//distance
-        assertEquals(bellman1d.doRun().getPath().getArcs(), dijkstra1d.doRun().getPath().getArcs());
-        assertEquals(bellman2d.doRun().getPath().getArcs(), dijkstra2d.doRun().getPath().getArcs());
-        assertEquals(bellman3d.doRun().getPath().getArcs(), dijkstra3d.doRun().getPath().getArcs());
+        assertEquals(bellman2d.doRun().getPath().getArcs(), cas2d.doRun().getPath().getArcs());
+        assertEquals(Status.OPTIMAL, cas2d.doRun().getStatus());
         //temps
-        assertEquals(bellman1t.doRun().getPath().getArcs(), dijkstra1d.doRun().getPath().getArcs());
-        assertEquals(bellman2t.doRun().getPath().getArcs(), dijkstra2d.doRun().getPath().getArcs());
-        assertEquals(bellman3t.doRun().getPath().getArcs(), dijkstra3d.doRun().getPath().getArcs());
+        assertEquals(bellman2t.doRun().getPath().getArcs(), cas2d.doRun().getPath().getArcs());
+        assertEquals(Status.OPTIMAL, cas2t.doRun().getStatus());
     }
-    
-    @Test
-    public void testAstar() {
-    	//distance
-        assertEquals(bellman1d.doRun().getPath().getArcs(), astar1d.doRun().getPath().getArcs());
-        assertEquals(bellman2d.doRun().getPath().getArcs(), astar2d.doRun().getPath().getArcs());
-        assertEquals(bellman3d.doRun().getPath().getArcs(), astar3d.doRun().getPath().getArcs());
-        //temps
-        assertEquals(bellman1t.doRun().getPath().getArcs(), astar1d.doRun().getPath().getArcs());
-        assertEquals(bellman2t.doRun().getPath().getArcs(), astar2d.doRun().getPath().getArcs());
-        assertEquals(bellman3t.doRun().getPath().getArcs(), astar3d.doRun().getPath().getArcs());
-    }
+	
 
 }
