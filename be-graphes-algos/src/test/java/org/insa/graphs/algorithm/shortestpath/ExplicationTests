@@ -1,0 +1,27 @@
+Tests Dijkstra 
+J'ai créé dans une classe un graphe court pour tester l'algorithme Dijkstra dans 3 cas en distance et en temps:
+	cas1: origine = destination
+	cas2: il existe plusieurs chemins possibles entre l'origine et la destination
+	cas3: le graphe est non connexe. Il n'y a pas de chemin possible entre l'origine et la destination
+	
+	
+Pour les cas 1 et 3, j'ai testé dans les fonctions TestInfeasable1() et TestInfeasable2() le statut de la solution retournée.
+Celui-ci doit avoir la valeurs "Infeasable" dans les 2 cas.
+J'ai également testé dans ces mêmes fonctions la valeur du path obtenu qui doit être nul dans les 2 cas.
+
+Pour le cas 2, j'ai effectué les tests suivants:
+	testIsValid(): teste si les paths des solutions obtenues en distance et en temps sont valides.
+	testBellman(): compare les chemins obtenus en distance et en temps avec ceux obtenus avec Bellman-Ford (ils doivent être identiques).
+	Il vérifie également que le statut de la solution est "Optimal".
+	
+J'ai également testé l'algorithme avec Oracle, en utilisant 2 cartes et 2 paths (distance et temps). 
+J'ai testé dans les fonctions Oracle_Length() et Oracle_Time():
+	la validité des paths des solutions retournés (avec la méthode isValid() de la classe path)
+	l'égalité entre le temps minimum de parcours de la solution et le temps minimum attendu
+	l'égalité entre la longueur du path de la solution et la longueur attendue
+	
+Tous les tests donnent le résultat attendu!!
+	
+Tests Astar
+J'ai créé une classe qui hérite de la classe de test de Dijkstra et qui exécute l'algorithme Astar au lieu de Dijkstra.
+Les tests sont les mêmes que ceux effectués pour Dijkstra et donnent tous les mêmes résultats.	
