@@ -206,19 +206,20 @@ public class DijkstraTest{
 	
 
 	@Test
-    public void Carte_Length(){
+    public void Oracle_Length(){
 		executeAlgo();
-		//assertEquals(pathl.getLength(), cas4d.doRun().getPath().getLength(), 1e-6);    
+		assertEquals(pathl.getLength(), cas4d.doRun().getPath().getLength(), 1e-6);    
 		assertEquals(pathl.getMinimumTravelTime(), cas4d.doRun().getPath().getMinimumTravelTime(), 1e-6);
-        
+		assertTrue(cas4d.doRun().getPath().isValid());
     }
 	
 	@Test
-    public void Carte_Time(){
+    public void Oracle_Time(){
 		executeAlgo();
 		assertEquals(patht.getLength(), cas4t.doRun().getPath().getLength(), 1e-6);  
 		assertEquals(patht.getMinimumTravelTime(), cas4t.doRun().getPath().getMinimumTravelTime(), 1e-6);
-    }
+		assertTrue(cas4t.doRun().getPath().isValid());
+	}
 	
 
 }
