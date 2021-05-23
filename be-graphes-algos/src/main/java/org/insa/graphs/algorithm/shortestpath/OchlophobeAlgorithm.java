@@ -1,30 +1,37 @@
 package org.insa.graphs.algorithm.shortestpath;
-
-import org.insa.graphs.model.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
+import org.insa.graphs.model.*;
 
-public class DijkstraAlgorithm extends ShortestPathAlgorithm {
+public class OchlophobeAlgorithm extends ShortestPathAlgorithm{
 
-    public DijkstraAlgorithm(ShortestPathData data) {
-        super(data);
-    }
+	protected OchlophobeAlgorithm(ShortestPathData data) {
+		super(data);
+	}
 
-    @Override
-    protected ShortestPathSolution doRun() {
-        final ShortestPathData data = getInputData();
+	@Override
+	protected ShortestPathSolution doRun() {
+		final ShortestPathData data = getInputData();
         Graph graph = data.getGraph();
         ArrayList<Label> labels = new ArrayList<Label>();
         BinaryHeap<Label> heap = new BinaryHeap<Label>();
         
         ShortestPathSolution solution = null;
-        // TODO:
         //initialisation 
+        int m_nbsucc= 0;  //moyenne des nombre de successeurs des nodes
         
-        Initialisation(graph, labels, heap, data);
+        for (Node node: graph.getNodes()) {
+        	m_nbsucc+= node.getNumberOfSuccessors();
+        	labels.add(new Label(node));
+        }
+        m_nbsucc= m_nbsucc/graph.size();
+        int seuil= m_nbsucc + m_nbsucc*20/100; //seuil qui détermine les noeuds les plus fréquentés
+        Label labelOrigin = labels.get(data.getOrigin().getId()); // origine de l'arc
+        labelOrigin.setCost(0);
+        heap.insert(labelOrigin);
         
         //itérations
         Label x;
@@ -43,7 +50,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    			System.out.println(x.getTotCost()+data.getCost(succ));
 	    			if (y.getTotCost()>x.getTotCost()+data.getCost(succ)) {
 	    				if(y.getPere()!=null) heap.remove(y);
-	    				y.setTotCost(x.getTotCost()+data.getCost(succ));
+	    				if (succ.getDestination().getNumberOfSuccessors()<=seuil) {
+	    					y.setTotCost(x.getTotCost()+data.getCost(succ));
+	    				} else {
+	    					y.setTotCost(x.getTotCost()+data.getCost(succ)+(x.getTotCost()+data.getCost(succ))/2);
+	    				}
 	    				heap.insert(y);
 	    				// test validité du tas
 	    				if(heap.isValid()) {
@@ -52,7 +63,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    		        	System.out.println("Le tas est invalide.");
 	    		        }
 	    				y.setPere(succ);
-	    				cout= cout + y.getTotCost();  
+	    				cout= cout + y.getTotCost();
 	    			}
 	    		}
 	    	}
@@ -84,15 +95,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         
         return solution;
-    }
-    
-    public void Initialisation(Graph graph, ArrayList<Label> labels, BinaryHeap<Label> heap, ShortestPathData data){
-    	for (Node node: graph.getNodes()) {
-        	labels.add(new Label(node));
-        }
-        Label labelOrigin = labels.get(data.getOrigin().getId()); // origine de l'arc
-        labelOrigin.setCost(0);
-        heap.insert(labelOrigin);
-    }
+	}
 
 }
