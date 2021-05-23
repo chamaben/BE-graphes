@@ -3,10 +3,18 @@ import org.insa.graphs.algorithm.ArcInspectorFactory;
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.model.*;
 import org.insa.graphs.model.RoadInformation.RoadType;
+import org.insa.graphs.model.io.BinaryGraphReader;
+import org.insa.graphs.model.io.BinaryPathReader;
+import org.insa.graphs.model.io.GraphReader;
+import org.insa.graphs.model.io.PathReader;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -15,7 +23,10 @@ import org.junit.Test;
 
 public class DijkstraTest{
 	// Small graph use for tests
-    private static Graph graph;
+    private static Graph graph, graph1, graph2;
+    
+    // path
+    private static Path pathl, patht;
     
     // graph statistics
     private static GraphStatistics graphstatistics;
@@ -31,7 +42,7 @@ public class DijkstraTest{
     private static Arc a2b, a2c, a2e, b2c, c2d_1, c2d_2, c2d_3, c2a, d2a, d2e, e2d, f2g, e2h, e2i, e2j;
     
     // data examples
-    protected static ShortestPathData data1d, data1t, data2d, data2t, data3d, data3t;
+    protected static ShortestPathData data1d, data1t, data2d, data2t, data3d, data3t, data4d, data4t;
     
     // Bellman Ford
     @SuppressWarnings("unused")
@@ -39,7 +50,7 @@ public class DijkstraTest{
     
     //Dijkstra
     @SuppressWarnings("unused")
-	protected static DijkstraAlgorithm cas1d, cas2d, cas3d, cas1t, cas2t, cas3t;
+	protected static DijkstraAlgorithm cas1d, cas2d, cas3d, cas1t, cas2t, cas3t, cas4d, cas4t;
     
     //A*
     @SuppressWarnings("unused")
@@ -50,7 +61,19 @@ public class DijkstraTest{
     @BeforeClass
     public static void initAll() throws IOException {
     	
-    	//Graph reader = new BinaryGraphReader(new DataInputStream(new BufferedInputStream(new FileInputStream(" ")))).read();
+    	// real maps
+    	final String map_t = "C:\\Be Graphes\\Maps\\haute-garonne.mapgr";
+    	final String path_t = "C:\\\\Be Graphes\\\\Maps\\path_fr31_insa_aeroport_time.path";
+    	final String map_l = "C:\\Be Graphes\\Maps\\insa.mapgr";
+	    final String path_l = "C:\\\\Be Graphes\\\\Maps\\path_fr31insa_rangueil_r2.path";
+	    
+
+	    final GraphReader readert = new BinaryGraphReader(new DataInputStream(new BufferedInputStream(new FileInputStream(map_t))));
+	    final GraphReader readerl = new BinaryGraphReader(new DataInputStream(new BufferedInputStream(new FileInputStream(map_l))));
+	    final PathReader pathReaderl = new BinaryPathReader(new DataInputStream(new BufferedInputStream(new FileInputStream(path_l))));
+	    final PathReader pathReadert = new BinaryPathReader(new DataInputStream(new BufferedInputStream(new FileInputStream(path_t))));
+	   
+	    
 
         // 10 and 20 meters per seconds
         RoadInformation speed10 = new RoadInformation(RoadType.MOTORWAY, null, true, 36, ""),
@@ -96,8 +119,14 @@ public class DijkstraTest{
         //add graph statistic
         graphstatistics= new GraphStatistics(null, 0, 0, 40, 0);
         
-        //add graph
+        //add graphs
         graph = new Graph("ID", "", Arrays.asList(nodes), graphstatistics);
+        graph1 = readert.read();
+        graph2 = readerl.read();
+        
+        // add paths
+        pathl = pathReaderl.readPath(graph2);
+        patht = pathReadert.readPath(graph1);
         
         // add data
         data1d= new ShortestPathData(graph, nodes[0], nodes[0], ArcInspectorFactory.getAllFilters().get(0));
@@ -106,6 +135,8 @@ public class DijkstraTest{
         data2t= new ShortestPathData(graph, nodes[0], nodes[1], ArcInspectorFactory.getAllFilters().get(2));
         data3d= new ShortestPathData(graph, nodes[0], nodes[7], ArcInspectorFactory.getAllFilters().get(0));
         data3t= new ShortestPathData(graph, nodes[0], nodes[7], ArcInspectorFactory.getAllFilters().get(2));
+        data4d = new ShortestPathData(graph2,pathl.getOrigin(),pathl.getDestination(),ArcInspectorFactory.getAllFilters().get(0));
+	    data4t = new ShortestPathData(graph1,patht.getOrigin(),patht.getDestination(),ArcInspectorFactory.getAllFilters().get(2));
         
         //add Bellman Ford, Dijkstra and A*
         bellman1d = new BellmanFordAlgorithm(data1d);
@@ -115,23 +146,26 @@ public class DijkstraTest{
         bellman3d = new BellmanFordAlgorithm(data3d);
         bellman3t = new BellmanFordAlgorithm(data3t);
         
-        executeAlgo();
+        
         
     }
     
-    public static void executeAlgo() {
+    public void executeAlgo() {
     	cas1d = new DijkstraAlgorithm(data1d);
         cas1t = new DijkstraAlgorithm(data1t);
         cas2d = new DijkstraAlgorithm(data2d);
         cas2t = new DijkstraAlgorithm(data2t);
         cas3d = new DijkstraAlgorithm(data3d);
         cas3t = new DijkstraAlgorithm(data3t);
+        cas4d = new DijkstraAlgorithm(data4d);
+        cas4t = new DijkstraAlgorithm(data4t);
     }
     
 
     
     @Test
     public void testIsValid() {  //teste si les solutions sont valides
+    	executeAlgo();
     	//distance
     	assertTrue(cas2d.doRun().getPath().isValid()); //solution possible
     	//temps
@@ -140,6 +174,7 @@ public class DijkstraTest{
     
     @Test
     public void TestInfeasable1() {
+    	executeAlgo();
     	assertEquals(Status.INFEASIBLE, cas1d.doRun().getStatus());
     	assertNull(cas1d.doRun().getPath());
     	assertEquals(Status.INFEASIBLE, cas1t.doRun().getStatus());
@@ -149,6 +184,7 @@ public class DijkstraTest{
     
     @Test
     public void TestInfeasable2() {
+    	executeAlgo();
     	assertEquals(Status.INFEASIBLE, cas3d.doRun().getStatus());
     	assertNull(cas3d.doRun().getPath());
     	assertEquals(Status.INFEASIBLE, cas3t.doRun().getStatus());
@@ -159,12 +195,29 @@ public class DijkstraTest{
 
 	@Test
     public void testBellman() {
+		executeAlgo();
     	//distance
         assertEquals(bellman2d.doRun().getPath().getArcs(), cas2d.doRun().getPath().getArcs());
         assertEquals(Status.OPTIMAL, cas2d.doRun().getStatus());
         //temps
         assertEquals(bellman2t.doRun().getPath().getArcs(), cas2d.doRun().getPath().getArcs());
         assertEquals(Status.OPTIMAL, cas2t.doRun().getStatus());
+    }
+	
+
+	@Test
+    public void Carte_Length(){
+		executeAlgo();
+		//assertEquals(pathl.getLength(), cas4d.doRun().getPath().getLength(), 1e-6);    
+		assertEquals(pathl.getMinimumTravelTime(), cas4d.doRun().getPath().getMinimumTravelTime(), 1e-6);
+        
+    }
+	
+	@Test
+    public void Carte_Time(){
+		executeAlgo();
+		assertEquals(patht.getLength(), cas4t.doRun().getPath().getLength(), 1e-6);  
+		assertEquals(patht.getMinimumTravelTime(), cas4t.doRun().getPath().getMinimumTravelTime(), 1e-6);
     }
 	
 
